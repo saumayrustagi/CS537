@@ -5,7 +5,7 @@
 int main(int argc, char *argv[])
 {
 	int fd;
-	char buf[2048];
+	char buf[4096];
 	ssize_t nread;
 
 	if ((fd = open(argv[1], O_RDONLY)) == -1)
