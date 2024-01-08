@@ -1,10 +1,10 @@
 ### Compiling
-`gcc -o <program> -O2 -Wall -Wshadow -Werror -std=c17 <code>.c`
+`gcc -o program -O2 -Wall -Wshadow -std=c17 program.c`
 
-### Mycat
+### mycat
 
 ```
->$ ./mycat mycat.c 
+> ./mycat mycat.c 
 #include <stdio.h>
 #include <fcntl.h>
 #include <unistd.h>
@@ -31,4 +31,17 @@ int main(int argc, char* argv[]){
 
 	return 0;
 }
+```
+
+### mygrep
+```
+> ./mygrep '=' mygrep.c
+        if ((fd = open(argv[2], O_RDONLY)) == -1)
+        while ((nread = read(fd, buf, sizeof buf)) > 0)
+                char *line = strtok(buf, "\n");
+                while (line != NULL)
+                                ssize_t total_written = 0;
+                                        written = write(STDOUT_FILENO, line + total_written, strlen(line) - total_written);
+                                        total_written += written;
+                        line = strtok(NULL, "\n");
 ```
