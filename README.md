@@ -45,3 +45,16 @@ int main(int argc, char* argv[]){
                                         total_written += written;
                         line = strtok(NULL, "\n");
 ```
+
+### mzip and munzip
+```
+> ./mzip in.txt > out.txt
+> ./munzip out.txt 
+a: 4
+b: 1
+a: 3
+b: 1
+a: 1
+b: 3
+a: 1
+```

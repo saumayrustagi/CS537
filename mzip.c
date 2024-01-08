@@ -3,7 +3,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 
-int stdoutput(char *buf, int size)
+int stdoutput(void *buf, int size)
 {
 	ssize_t total_written = 0;
 	while (total_written < size)
@@ -14,24 +14,6 @@ int stdoutput(char *buf, int size)
 		total_written += written;
 	}
 	return 0;
-}
-
-char* decToBinary(int n)
-{
-	char* binaryNum = malloc(32*(sizeof(char)));
-
-	for (int i = 0; i < 32; ++i)
-		binaryNum[i] = (char)'0';
-
-	int i = 0;
-	while (n != 0)
-	{
-		binaryNum[31-i] = (abs(n % 2)) + (int)'0';
-		n = n / 2;
-		++i;
-	}
-
-	return binaryNum;
 }
 
 int main(int argc, char *argv[])
@@ -59,7 +41,7 @@ int main(int argc, char *argv[])
 			}
 			else
 			{
-				if (stdoutput(decToBinary(count), 32) == 1)
+				if (stdoutput(&count, sizeof count) == 1)
 					return 1;
 				if (stdoutput(wrbuf, 1) == 1)
 					return 1;
