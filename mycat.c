@@ -8,7 +8,8 @@ int main(int argc, char *argv[])
 	char buf[4096];
 	ssize_t nread;
 
-	if ((fd = open(argv[1], O_RDONLY)) == -1)
+	if (argc < 2) fd = STDIN_FILENO;
+	else if ((fd = open(argv[1], O_RDONLY)) == -1)
 	{
 		return -1;
 	}
@@ -25,7 +26,7 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	close(fd);
+	if (argc >= 2) close(fd);
 
 	return 0;
 }
