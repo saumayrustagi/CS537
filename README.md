@@ -1,5 +1,5 @@
 ### Compiling
-`gcc -o program -O2 -Wall -Wshadow -std=c17 program.c`
+`gcc -std=c17 -o program -Wshadow -Wall -g -fsanitize=address -fsanitize=undefined -D_GLIBCXX_DEBUG program.c`
 
 ### mycat
 
@@ -48,6 +48,8 @@ int main(int argc, char* argv[]){
 
 ### mzip and munzip
 ```
+> ./mycat in.txt 
+aaaabaaababbba
 > ./mzip in.txt > out.txt
 > ./munzip out.txt 
 a: 4

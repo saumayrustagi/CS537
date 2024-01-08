@@ -3,6 +3,19 @@
 #include <unistd.h>
 #include <fcntl.h>
 
+int stdoutput(void *buf, int size)
+{
+	ssize_t total_written = 0;
+	while (total_written < size)
+	{
+		ssize_t written = write(STDOUT_FILENO, buf + total_written, size - total_written);
+		if (written < 1)
+			return 1;
+		total_written += written;
+	}
+	return 0;
+}
+
 int main(int argc, char *argv[])
 {
 	int fd;
@@ -21,7 +34,10 @@ int main(int argc, char *argv[])
 
 	while (read(fd, &count, sizeof count) > 0 && read(fd, &c, sizeof c) > 0)
 	{
-		printf("%c: %d\n", c, count);
+		for (int i = 0; i < count; ++i)
+		{
+			stdoutput(&c, sizeof(c));
+		}
 	}
 
 	if (argc >= 2)
