@@ -1,18 +1,13 @@
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <stdio.h>
 #include <fcntl.h>
 #include <unistd.h>
 
-int main(int argc, char *argv[])
+int cat(int fd)
 {
-	int fd;
 	char buf[4096];
 	ssize_t nread;
-
-	if (argc < 2) fd = STDIN_FILENO;
-	else if ((fd = open(argv[1], O_RDONLY)) == -1)
-	{
-		return -1;
-	}
 
 	while ((nread = read(fd, buf, sizeof buf)) > 0)
 	{
@@ -26,7 +21,30 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	if (argc >= 2) close(fd);
+	return 0;
+}
+
+int main(int argc, char *argv[])
+{
+	int fd;
+	if (argc < 2)
+	{
+		fd = STDIN_FILENO;
+		cat(fd);
+	}
+	else
+		for (int i = 1; i < argc; ++i)
+		{
+			if ((fd = open(argv[i], O_RDONLY)) == -1)
+			{
+				return 1;
+			}
+
+			if (cat(fd) == 1)
+				return 1;
+
+			close(fd);
+		}
 
 	return 0;
 }
