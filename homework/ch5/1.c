@@ -2,28 +2,26 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/wait.h>
 
-int main()
+int main(int argc, char* argv[])
 {
-	int x = 100;
 	printf("My PID = %d\n", getpid());
-
-
+	fflush(stdout);
 	int rc = fork();
-
 	if (rc < 0)
+	{
+		perror("fork failed");
 		return 1;
+	}
 	else if (rc == 0)
 	{
-		printf("%d\n", x);
-		x += 50;
-		printf("%d\n", x);
+		close(STDOUT_FILENO);
+		printf("Child trying to print!!!");
 	}
 	else
 	{
-		printf("%d\n", x);
-		x += 25;
-		printf("%d\n", x);
+		printf("parent wait returns %d", (int)waitpid(-1, NULL, (long long)NULL));
 	}
 	return 0;
 }
