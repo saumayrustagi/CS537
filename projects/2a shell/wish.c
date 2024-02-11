@@ -9,7 +9,21 @@
 #include <error.h>
 #include <errno.h>
 
-int main()
+void tokenize(char *str, char *myargv[])
+{
+	char *token;
+	int i = 0;
+	while ((token = strsep(&str, " \n")) != NULL)
+	{
+		if (token[0] != '\0')
+		{
+			myargv[i] = strdup(token);
+			++i;
+		}
+	}
+}
+
+int wish()
 {
 	while (1)
 	{
@@ -18,12 +32,21 @@ int main()
 		n = 0;
 		char *buf = NULL;
 
-		printf("wish> ");
+		printf("(%d)> ", getpid());
 
 		if ((linelength = getline(&buf, &n, stdin)) < 1)
 		{
-			perror(NULL);
-			break;
+			if (buf != NULL)
+				free(buf);
+			if (feof(stdin))
+			{
+				fprintf(stderr, "EOF encountered\n");
+				exit(EXIT_SUCCESS);
+			}
+			{
+				perror(NULL);
+				exit(EXIT_FAILURE);
+			}
 		}
 
 		pid_t rc;
@@ -31,33 +54,33 @@ int main()
 
 		if (rc == -1)
 		{
-			perror(NULL);
-			break;
+			perror("fork failure");
+			exit(EXIT_FAILURE);
 		}
 		if (rc == 0)
 		{
-			char *token;
-			int i = 0;
-			while ((token = strsep(&buf, "\n ")) != NULL)
+			char *myargv[2];
+
+			tokenize(buf, myargv);
+			free(buf);
+
+			myargv[1] = NULL;
+			for (int i = 0; i < 2; ++i)
 			{
-				printf("token = %s || buffer = ", token);
-				for(int j=0; j!=NULL; ++j){
-					printf("(%d)", buf[j]);
-				}
-				++i;
+				printf("%s_\n", myargv[i]);
 			}
-			printf("i = %d", i);
-			// char* myargv[4096];
-			// myargv[0] = "/bin/ls";
-			// myargv[1] = NULL;
-			// execv(myargv[0], myargv);
+			break;
 		}
 		else
 		{
+			free(buf);
 			wait(NULL);
 		}
-
-		// free(buf);
 	}
-	exit(0);
+	return EXIT_SUCCESS;
+}
+
+int main()
+{
+	return wish();
 }
