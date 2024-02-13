@@ -70,30 +70,40 @@ int wish()
 		}
 		if (rc == 0)
 		{
-			char **myargv = malloc(sizeof(char *) * 1024);
-			int tokln = tokenize(buf, myargv) + 1;
+			// Initialize and Tokenize
+			char **inargv = malloc(sizeof(char *) * 1024);
+			int tokln = tokenize(buf, inargv) + 1;
 
-			char **pargv = reallocarray(myargv, tokln, sizeof(char *));
-			pargv[tokln - 1] = NULL;
+			// Resize
+			char **tmp;
+			if ((tmp = reallocarray(inargv, tokln, sizeof(char *))) != NULL)
+				inargv = tmp;
 
-			// for (int i = 0; i < tokln; ++i)
-			// {
-			// 	if (pargv[i] == NULL)
-			// 		printf("(null)\n");
-			// 	else
-			// 		printf("%s\n", pargv[i]);
-			// }
+			// Construct program vector
+			char *myargv[tokln];
 
-			// for (int i = 0; i < tokln; ++i)
-			// {
-			// 	if (pargv[i] != NULL)
-			// 	{
-			// 		free(pargv[i]);
-			// 	}
-			// }
-			// if (pargv != NULL)
-			// 	free(pargv);
-			// break;
+			for (int i = 0; i < tokln; ++i)
+			{
+				myargv[i] = inargv[i];
+			}
+			myargv[tokln - 1] = NULL;
+
+			if (tokln > 1)
+			{
+				execv(myargv[0], myargv);
+
+				perror(NULL);
+				for (int i = 0; i < tokln; ++i)
+				{
+					if (myargv[i] != NULL)
+					{
+						free(myargv[i]);
+					}
+				}
+			}
+
+			free(inargv);
+			break;
 		}
 		else
 		{
