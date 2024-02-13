@@ -8,9 +8,16 @@
 #include <stdlib.h>
 #include <error.h>
 #include <errno.h>
+#include <stdint.h>
 
-void tokenize(char *str, char *myargv[])
+// typedef int64_t i64;
+// typedef int32_t i32;
+// typedef uint32_t ui32;
+// typedef uint64_t ui64;
+
+int tokenize(char *str, char **myargv)
 {
+	char *tmp = str;
 	char *token;
 	int i = 0;
 	while ((token = strsep(&str, " \n")) != NULL)
@@ -21,6 +28,10 @@ void tokenize(char *str, char *myargv[])
 			++i;
 		}
 	}
+	if (tmp != NULL)
+		free(tmp);
+
+	return i;
 }
 
 int wish()
@@ -59,21 +70,35 @@ int wish()
 		}
 		if (rc == 0)
 		{
-			char *myargv[2];
+			char **myargv = malloc(sizeof(char *) * 1024);
+			int tokln = tokenize(buf, myargv) + 1;
 
-			tokenize(buf, myargv);
-			free(buf);
+			char **pargv = reallocarray(myargv, tokln, sizeof(char *));
+			pargv[tokln - 1] = NULL;
 
-			myargv[1] = NULL;
-			for (int i = 0; i < 2; ++i)
-			{
-				printf("%s_\n", myargv[i]);
-			}
-			break;
+			// for (int i = 0; i < tokln; ++i)
+			// {
+			// 	if (pargv[i] == NULL)
+			// 		printf("(null)\n");
+			// 	else
+			// 		printf("%s\n", pargv[i]);
+			// }
+
+			// for (int i = 0; i < tokln; ++i)
+			// {
+			// 	if (pargv[i] != NULL)
+			// 	{
+			// 		free(pargv[i]);
+			// 	}
+			// }
+			// if (pargv != NULL)
+			// 	free(pargv);
+			// break;
 		}
 		else
 		{
-			free(buf);
+			if (buf != NULL)
+				free(buf);
 			wait(NULL);
 		}
 	}
