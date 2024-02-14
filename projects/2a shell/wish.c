@@ -87,12 +87,13 @@ int wish()
 				myargv[i] = inargv[i];
 			}
 			myargv[tokln - 1] = NULL;
+			free(inargv);
 
 			if (tokln > 1)
 			{
 				execv(myargv[0], myargv);
 
-				perror(NULL);
+				perror("execv failed");
 				for (int i = 0; i < tokln; ++i)
 				{
 					if (myargv[i] != NULL)
@@ -102,7 +103,6 @@ int wish()
 				}
 			}
 
-			free(inargv);
 			break;
 		}
 		else
