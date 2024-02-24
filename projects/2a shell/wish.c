@@ -1,6 +1,7 @@
 #define _POSIX_C_SOURCE 200809L
 #define _DEFAULT_SOURCE
 #include <sys/wait.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
@@ -16,6 +17,7 @@
 // typedef uint64_t ui64;
 int tokenize(char *str, char **myargv);
 void exec_prog(char *myargv[]);
+bool check_redirect(char *myargv[], int tokln);
 int wish();
 
 int main()
@@ -43,6 +45,7 @@ int wish()
 				fprintf(stderr, "EOF encountered\n");
 				exit(EXIT_SUCCESS);
 			}
+			else
 			{
 				perror(NULL);
 				exit(EXIT_FAILURE);
@@ -80,6 +83,17 @@ int wish()
 
 			if (tokln > 1)
 			{
+				bool redirect = false;
+				if (tokln > 3)
+					redirect = check_redirect(myargv, tokln);
+				if (redirect)
+				{
+					for (int i = 2; i < 4; ++i)
+					{
+						free(myargv[tokln - i]);
+						myargv[tokln - i] = NULL;
+					}
+				}
 				exec_prog(myargv);
 				for (int i = 0; i < tokln; ++i)
 				{
@@ -151,4 +165,18 @@ int tokenize(char *str, char **myargv)
 		free(tmp);
 
 	return i;
+}
+
+bool check_redirect(char *myargv[], int tokln)
+{
+	if (strcmp(myargv[tokln - 3], ">") == 0)
+	{
+		if (freopen(myargv[tokln - 2], "w+", stdout) == NULL)
+		{
+			perror("freopen failed");
+			exit(EXIT_FAILURE);
+		}
+		return true;
+	}
+	return false;
 }
