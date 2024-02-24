@@ -14,24 +14,13 @@
 // typedef int32_t i32;
 // typedef uint32_t ui32;
 // typedef uint64_t ui64;
+int tokenize(char *str, char **myargv);
+void exec_prog(char *myargv[]);
+int wish();
 
-int tokenize(char *str, char **myargv)
+int main()
 {
-	char *tmp = str;
-	char *token;
-	int i = 0;
-	while ((token = strsep(&str, " \n")) != NULL)
-	{
-		if (token[0] != '\0')
-		{
-			myargv[i] = strdup(token);
-			++i;
-		}
-	}
-	if (tmp != NULL)
-		free(tmp);
-
-	return i;
+	return wish();
 }
 
 int wish()
@@ -91,9 +80,7 @@ int wish()
 
 			if (tokln > 1)
 			{
-				execv(myargv[0], myargv);
-
-				perror("execv failed");
+				exec_prog(myargv);
 				for (int i = 0; i < tokln; ++i)
 				{
 					if (myargv[i] != NULL)
@@ -115,7 +102,53 @@ int wish()
 	return EXIT_SUCCESS;
 }
 
-int main()
+void exec_prog(char *myargv[])
 {
-	return wish();
+	if (strstr(myargv[0], "/") == NULL)
+	{
+		char *fullpath;
+		char *path = strdup(getenv("PATH"));
+		char *tok = strtok(path, ":");
+		while (tok != NULL)
+		{
+			fullpath = malloc(strlen(tok) + strlen(myargv[0]) + 2);
+			strcpy(fullpath, tok);
+			strcat(fullpath, "/");
+			strcat(fullpath, myargv[0]);
+
+			if (access(fullpath, X_OK) == 0)
+			{
+				myargv[0] = fullpath;
+				execv(myargv[0], myargv);
+			}
+			free(fullpath);
+
+			tok = strtok(NULL, ":");
+		}
+		free(path);
+	}
+	else
+	{
+		execv(myargv[0], myargv);
+	}
+	perror("execv failed");
+}
+
+int tokenize(char *str, char **myargv)
+{
+	char *tmp = str;
+	char *token;
+	int i = 0;
+	while ((token = strsep(&str, " \n")) != NULL)
+	{
+		if (token[0] != '\0')
+		{
+			myargv[i] = strdup(token);
+			++i;
+		}
+	}
+	if (tmp != NULL)
+		free(tmp);
+
+	return i;
 }
